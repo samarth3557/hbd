@@ -140,35 +140,33 @@
         function animate() {
             requestAnimationFrame(animate);
             frame += 0.01;
-
             const posAttribute = geometry.attributes.position;
-
+            const colAttribute = geometry.attributes.color; // Get the color attribute
+        
             for (let i = 0; i < totalParticles; i++) {
                 const x = posAttribute.getX(i);
                 const y = posAttribute.getY(i);
                 const z = posAttribute.getZ(i);
-
+        
                 if (isHeartFormed) {
-                    // Slowly drift to heart shape
+                    // 1. Move to Heart Shape
                     const target = heartPoints[i];
-                    posAttribute.setXYZ(
-                        i,
-                        x + (target.x - x) * 0.05,
-                        y + (target.y - y) * 0.05,
-                        z + (target.z - z) * 0.05
+                    posAttribute.setXYZ(i, x + (target.x - x) * 0.05, y + (target.y - y) * 0.05, z + (target.z - z) * 0.05);
+        
+                    // 2. Change Color to Pink (Smoothly)
+                    colAttribute.setXYZ(i, 
+                        colAttribute.getX(i) + (1.0 - colAttribute.getX(i)) * 0.05, // Shift R to 1.0
+                        colAttribute.getY(i) + (0.05 - colAttribute.getY(i)) * 0.05, // Shift G to 0.05
+                        colAttribute.getZ(i) + (0.5 - colAttribute.getZ(i)) * 0.05   // Shift B to 0.5
                     );
                 } else {
-                    // Random floating movement
-                    posAttribute.setXYZ(
-                        i,
-                        x + Math.sin(frame + i) * 0.02,
-                        y + Math.cos(frame + i) * 0.02,
-                        z + Math.sin(frame * 0.5 + i) * 0.02
-                    );
+                    // Floating movement
+                    posAttribute.setXYZ(i, x + Math.sin(frame + i) * 0.02, y + Math.cos(frame + i) * 0.02, z + Math.sin(frame * 0.5 + i) * 0.02);
                 }
             }
-
+        
             posAttribute.needsUpdate = true;
+            colAttribute.needsUpdate = true; // Tell Three.js the colors changed
             particleSystem.rotation.y += 0.005;
             renderer.render(scene, camera);
         }
@@ -192,3 +190,4 @@
     </script>
 </body>
 </html>
+
